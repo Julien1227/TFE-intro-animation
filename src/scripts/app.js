@@ -1,167 +1,146 @@
 "use sctrict";
 
+const startBtn = document.getElementById('begin');
+
 //Web audio api
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
-var context = new AudioContext();
-var myBuffer;
+startBtn.addEventListener('click', (event) => {
 
-var request = new XMLHttpRequest();
+    gsap.to(startBtn, {
+        opacity: 0
+    })
 
-var o = context.createOscillator();
-o.start(0);
-
-var g = context.createGain();
-g.gain.value = 0;
-
-o.frequency.value = 0;
-
-o.connect(g);
-o.type = "triangle";
-g.connect(context.destination);
-
-
-
-const letters = document.querySelectorAll('#h1-letter');
-const letterColors = [];
-var time = 150; //ms
-
-const frqs = [],
-      gains = [];
-
-const tl = gsap.timeline({});
-
-
-
-/* Pour chaque lettre, assigne une couleur random */
-const rgbColor = [];
-const hslColor = [];
-var count = 0;
-letters.forEach(element => {
-    //Crée la couleur en HSL pour jouer la note plus tard
-    let h = randomMinMax(0, 360),
-    s = randomMinMax(10, 100),
-    l = randomMinMax(20, 90);
+    var context = new AudioContext();
+    var myBuffer;
     
-    // Récupère les couleurs tsl
-    hslColor.push([h, s, l]);
+    var request = new XMLHttpRequest();
     
-    // Récupère les couleurs rvg depuis la convertion des tsl
-    rgbColor.push(HSLToRGB(h, s, l));
+    var o = context.createOscillator();
+    o.start(0);
     
-    element.setAttribute('style', 'color:rgb('+rgbColor[count][0]+', '+rgbColor[count][1]+', '+rgbColor[count][2]+')');
-    setSoundOptions(rgbColor[count][0], +rgbColor[count][1], +rgbColor[count][2], s, l)
-    count++;
+    var g = context.createGain();
+    g.gain.value = 0;
     
-});
-console.log(frqs, gains);
-
-// ANIMATION GSAP
-tl.from(letters, {
-    delay: 1,
-    duration: 0.001,
-    stagger: time/1000,
-    color: "white",
-    onComplete: showText
-})
-.to(letters, {
-    color: "white"
-})
-
-function showText(){
-    tl.to(letters, {
-        duration: 0.05,
-        stagger: 0.05,
-        color: "black",
+    o.frequency.value = 0;
+    
+    o.connect(g);
+    o.type = "triangle";
+    g.connect(context.destination);
+    
+    
+    
+    const letters = document.querySelectorAll('#h1-letter');
+    const letterColors = [];
+    var time = 150; //ms
+    
+    const frqs = [],
+    gains = [];
+    
+    const tl = gsap.timeline({});
+    
+    
+    
+    /* Pour chaque lettre, assigne une couleur random */
+    const rgbColor = [];
+    const hslColor = [];
+    var count = 0;
+    letters.forEach(element => {
+        //Crée la couleur en HSL pour jouer la note plus tard
+        let h = randomMinMax(0, 360),
+        s = randomMinMax(70, 100),
+        l = randomMinMax(40, 60);
+        
+        // Récupère les couleurs tsl
+        hslColor.push([h, s, l]);
+        
+        // Récupère les couleurs rvg depuis la convertion des tsl
+        rgbColor.push(HSLToRGB(h, s, l));
+        
+        element.setAttribute('style', 'color:rgb('+rgbColor[count][0]+', '+rgbColor[count][1]+', '+rgbColor[count][2]+')');
+        setSoundOptions(rgbColor[count][0], +rgbColor[count][1], +rgbColor[count][2], s, l)
+        count++;
+        
+    });
+    console.log(frqs, gains);
+    
+    // ANIMATION GSAP
+    tl.from(letters, {
+        delay: 1,
+        duration: 0.001,
+        stagger: time/1000,
+        color: "white",
         onComplete: showText
     })
-}
-
-function setSoundOptions(red, green, blue, lum, sat) {
-    let frq = Math.round((red + green*1.7 + blue*0.3) * 100) / 100;
-    //Si la couleur est lumineuse, alors le son s'estompe également
-    if(lum >= 50) {
-        lum = 100 - lum;
-    }
-
-    gain = (sat/100)*(lum/100);
-    gain = (Math.round(gain * 100) / 100)*2;
-
-    //Si couleur invisible -> son 0
-    if(lum == 0 || lum == 100 || sat == 0) {
-        gain = 0;
-    }
-
-    gains.push(gain);
-    frqs.push(frq);
-}
-
-//Joue chaque paramètre les uns après les autres
-setTimeout(function() {
-    for(var i = 0; i < frqs.length; i++) {
-        play(i);
-    }
-}, 1000 - time);
-
-
-function play(i) {
-    setTimeout(function() {
-        o.frequency.value = frqs[i];
-        g.gain.value = gains[i];
-    }, i*time);
-}
-
-setTimeout(function() {
-    g.gain.value = 0;
-}, (1000 - time)+(frqs.length*time));
-
-setTimeout(function() {
-    tl.to(letters, {
-        delay: 1,
-        opacity: 0,
-        stagger: 0.05,
-        scale: 0
+    .to(letters, {
+        color: "white"
     })
-}, (1000 - time)+(frqs.length*time));
-
-
-
-
-
-
-
-
-
-
-/*
-//Les rejoue à l'envers pour deux fois plus de plaisir  
-setTimeout(function() {
-    frqs.reverse();
-    gainValues.reverse();
-    for(var i = 1; i < frqs.length; i++) {
-        playReverse(i);
+    
+    function showText(){
+        tl.to(letters, {
+            duration: 0.05,
+            stagger: 0.05,
+            color: "black",
+            onComplete: showText
+        })
     }
-}, (frqs.length - 1)*speed);
-
-function playReverse(i) {
+    
+    function setSoundOptions(red, green, blue, lum, sat) {
+        let frq = Math.round((red + green*1.7 + blue*0.3) * 100) / 100;
+        //Si la couleur est lumineuse, alors le son s'estompe également
+        if(lum >= 50) {
+            lum = 100 - lum;
+        }
+        
+        gain = (sat/100)*(lum/100);
+        gain = (Math.round(gain * 100) / 100)*2;
+        
+        //Si couleur invisible -> son 0
+        if(lum == 0 || lum == 100 || sat == 0) {
+            gain = 0;
+        }
+        
+        gains.push(gain);
+        frqs.push(frq);
+    }
+    
+    //Joue chaque paramètre les uns après les autres
     setTimeout(function() {
-        o.frequency.value = frqs[i];
-        g.gain.value = gainValues[i];
-    }, i*speed);
+        for(var i = 0; i < frqs.length; i++) {
+            play(i);
+        }
+    }, 1000 - time);
+    
+    
+    function play(i) {
+        setTimeout(function() {
+            o.frequency.value = frqs[i];
+            g.gain.value = gains[i];
+            
+            g.gain.linearRampToValueAtTime(0.001, context.currentTime + (time-0.1));
+        }, i*time);
+    }
+    
+    setTimeout(function() {
+        g.gain.value = 0;
+    }, (1000 - time)+(frqs.length*time));
+    
+    setTimeout(function() {
+        tl.to(letters, {
+            delay: 1,
+            opacity: 0,
+            stagger: 0.05,
+            scale: 0
+        })
+    }, (1000 - time)+(frqs.length*time));
+});
+    
+    
+    
+    
+    
+function deleteElement(e) {
+    e.remove();
 }
-
-//Arrête le son après que les couleurs aient joué deux fois
-setTimeout(function() {
-    o.frequency.value = 0;
-    g.gain.value = 0;
-}, ((frqs.length*2)-1)*speed);*/
-
-
-
-
-
-
-
-
 
 //source: https://gist.github.com/brunomonteiro3/27af6d18c2b0926cdd124220f83c474d
 function randomMinMax(min,max){
