@@ -1,11 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 body {
-  font-family: sans-serif;
+  font-family: 'Raleway', sans-serif;
   font-size: $size-text;
   line-height: $line-height;
   color: $black;
 }
 
-h1 {font-size: $h1;}
+h1 {
+  font-size: 0;
+  white-space: nowrap;
+  font-weight: 900;
+  span {
+    display: inline-block;
+    font-size: $h1;
+  }
+}
+
 h2 {font-size: $h2;}
 h3 {font-size: $h3;}
 h4 {font-size: $h4;}
